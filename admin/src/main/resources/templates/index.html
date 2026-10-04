@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Админка — Главная</title>
+    <style>
+        body { font-family: sans-serif; margin:0; background:#ecf0f1; }
+        main { padding:20px 30px; }
+        .cards { display:flex; gap:20px; margin-bottom:30px; }
+        .card { background:white; padding:20px; border-radius:8px; flex:1;
+            box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        .card .num { font-size:32px; font-weight:bold; color:#2c3e50; }
+        .card .lbl { color:#7f8c8d; margin-top:4px; }
+        h2 { color:#2c3e50; margin-top:0; }
+        table { width:100%; background:white; border-collapse:collapse;
+            border-radius:8px; overflow:hidden;
+            box-shadow:0 1px 4px rgba(0,0,0,0.08); margin-bottom:20px; }
+        th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #ecf0f1; }
+        th { background:#34495e; color:white; font-size:13px; }
+        .top5 { display:flex; gap:20px; }
+        .top5 > div { flex:1; }
+    </style>
+</head>
+<body>
+<div th:replace="fragments :: menu"></div>
+<main>
+    <h2>Обзор</h2>
+    <div class="cards">
+        <div class="card">
+            <div class="num" th:text="${stats.users}">0</div>
+            <div class="lbl">Пользователей</div>
+        </div>
+        <div class="card">
+            <div class="num" th:text="${stats.records}">0</div>
+            <div class="lbl">Всего партий</div>
+        </div>
+        <div class="card">
+            <div class="num" th:text="${stats.wins}">0</div>
+            <div class="lbl">Побед</div>
+        </div>
+    </div>
+
+    <h2>Топ-5 по сложностям</h2>
+    <div class="top5">
+        <div>
+            <h3>Новичок</h3>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topEasy}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <h3>Любитель</h3>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topMedium}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <h3>Профессионал</h3>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topHard}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

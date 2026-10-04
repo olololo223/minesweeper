@@ -1,0 +1,79 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+# Maven
+*.jar
+*.war
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IDE
+.idea/
+.settings/
+nbproject/
+
+# Логи
+logs/
+*.log
+
+# Секреты и сертификаты
+*.jks
+*.p12
+*.pem
+*.key
+
+# Внешние конфиги (не в src)
+/db.properties
+/client.properties
+
+# Шаблоны — наоборот, коммитим
+!**/src/main/resources/db.properties.example
+!**/src/main/resources/client.properties
+admin-keystore.p12
+server-keystore.jks
+server-cert.pem
+server-key.pem
+
+# ОС
+Thumbs.db
+desktop.ini

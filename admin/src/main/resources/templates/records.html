@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Игровые записи</title>
+    <style>
+        body { font-family: sans-serif; margin:0; background:#ecf0f1; }
+        main { padding:20px 30px; }
+        h2 { color:#2c3e50; margin-top:0; }
+        .msg { background:#d4edda; color:#155724; padding:10px 14px;
+            border-radius:4px; margin-bottom:15px; }
+        table { width:100%; background:white; border-collapse:collapse;
+            border-radius:8px; overflow:hidden;
+            box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #ecf0f1; }
+        th { background:#34495e; color:white; font-size:13px; }
+        .win { color:#27ae60; font-weight:bold; }
+        .lose { color:#e74c3c; }
+        .btn-del { background:#e74c3c; color:white; border:none;
+            padding:5px 10px; border-radius:4px; cursor:pointer;
+            font-size:12px; }
+        form { display:inline; }
+    </style>
+</head>
+<body>
+<div th:replace="fragments :: menu"></div>
+<main>
+    <h2>Последние записи (до <span th:text="${limit}">100</span>)</h2>
+    <div class="msg" th:if="${msg}" th:text="${msg}"></div>
+    <table>
+        <tr>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='id', dir=${sort == 'id' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    ID <span th:if="${sort == 'id'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='username', dir=${sort == 'username' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Игрок <span th:if="${sort == 'username'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='difficulty', dir=${sort == 'difficulty' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Сложность <span th:if="${sort == 'difficulty'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='duration_seconds', dir=${sort == 'duration_seconds' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Время <span th:if="${sort == 'duration_seconds'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='win', dir=${sort == 'win' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Результат <span th:if="${sort == 'win'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/records(limit=${limit}, sort='played_at', dir=${sort == 'played_at' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Когда <span th:if="${sort == 'played_at'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th></th>
+        </tr>
+        <tr th:each="r : ${records}">
+            <td th:text="${r.id}">1</td>
+            <td th:text="${r.username}">alice</td>
+            <td th:text="${r.difficulty}">EASY</td>
+            <td th:text="${r.duration_seconds} + ' сек.'">42</td>
+            <td th:classappend="${r.win} ? 'win' : 'lose'"
+                th:text="${r.win} ? 'Победа' : 'Проигрыш'">Победа</td>
+            <td th:text="${r.played_at}">-</td>
+            <td>
+                <form method="post" action="/records/delete"
+                      onsubmit="return confirm('Удалить запись?');">
+                    <input type="hidden" name="_csrf" th:value="${csrfToken}"/>
+                    <input type="hidden" name="id" th:value="${r.id}"/>
+                    <button type="submit" class="btn-del">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</main>
+</body>
+</html>

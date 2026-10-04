@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Куда пишем файлы -->
+    <property name="LOG_DIR" value="logs"/>
+    <property name="APP_NAME" value="server"/>
+
+    <!-- Формат сообщения в консоли (цветной) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{20}) - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Файл с ротацией по дням -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Каждый день — новый файл, старые архивируются в .gz -->
+            <fileNamePattern>${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- Храним 30 дней -->
+            <maxHistory>30</maxHistory>
+            <!-- Общий размер всех файлов не больше 1 ГБ -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Netty шумит на INFO — приглушим до WARN -->
+    <logger name="io.netty" level="WARN"/>
+    <!-- HikariCP приятно логирует пул — оставим INFO -->
+    <logger name="com.zaxxer.hikari" level="INFO"/>
+
+    <!-- Наш код — INFO и выше -->
+    <logger name="com.example.minesweeper" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

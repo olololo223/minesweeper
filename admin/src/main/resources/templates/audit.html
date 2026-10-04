@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Аудит действий</title>
+    <style>
+        body { font-family: sans-serif; margin:0; background:#ecf0f1; }
+        main { padding:20px 30px; }
+        h2 { color:#2c3e50; margin-top:0; }
+        table { width:100%; background:white; border-collapse:collapse;
+            border-radius:8px; overflow:hidden;
+            box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #ecf0f1; }
+        th { background:#34495e; color:white; font-size:13px; }
+        .action { font-weight:bold; color:#2c3e50; }
+    </style>
+</head>
+<body>
+<div th:replace="fragments :: menu"></div>
+<main>
+    <h2>Последние действия (до <span th:text="${limit}">200</span>)</h2>
+    <table>
+        <tr>
+            <th>ID</th><th>Действие</th><th>Объект</th>
+            <th>Детали</th><th>Когда</th>
+        </tr>
+        <tr th:each="a : ${actions}">
+            <td th:text="${a.id}">1</td>
+            <td class="action" th:text="${a.action}">USER_DELETE</td>
+            <td th:text="${a.target}">user#5</td>
+            <td th:text="${a.details}">-</td>
+            <td th:text="${a.created_at}">-</td>
+        </tr>
+    </table>
+</main>
+</body>
+</html>
