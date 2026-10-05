@@ -9,6 +9,9 @@ public enum MessageType {
     LOGIN_REQUEST(LoginRequest.class),
     LOGIN_RESPONSE(LoginResponse.class),
 
+    CHANGE_PASSWORD_REQUEST(ChangePasswordRequest.class),      // ← новое
+    CHANGE_PASSWORD_RESPONSE(ChangePasswordResponse.class),    // ← новое
+
     SUBMIT_SCORE_REQUEST(SubmitScoreRequest.class),
     SUBMIT_SCORE_RESPONSE(SubmitScoreResponse.class),
 

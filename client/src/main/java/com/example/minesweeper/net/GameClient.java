@@ -223,4 +223,13 @@ public class GameClient {
             ctx.close();
         }
     }
+
+    public CompletableFuture<ChangePasswordResponse> changePassword(String oldPass,
+                                                                    String newPass) {
+        CompletableFuture<ChangePasswordResponse> f = new CompletableFuture<>();
+        registerPending(MessageType.CHANGE_PASSWORD_RESPONSE, f);
+        send(MessageType.CHANGE_PASSWORD_REQUEST,
+                new ChangePasswordRequest(oldPass, newPass));
+        return f;
+    }
 }

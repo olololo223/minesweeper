@@ -125,6 +125,12 @@ public class Minesweeper extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         JMenu gameMenu = new JMenu("Игра");
         JMenu netMenu = new JMenu("Сеть");
+        JMenu accountMenu = new JMenu("Аккаунт");
+        JMenuItem changePwdItem = new JMenuItem("Сменить пароль...");
+        changePwdItem.setEnabled(gameClient != null && gameClient.isConnected());
+        changePwdItem.addActionListener(e -> showChangePasswordDialog());
+        accountMenu.add(changePwdItem);
+        menuBar.add(accountMenu);
         JMenuItem leaderboardItem = new JMenuItem("Рейтинг...");
         leaderboardItem.addActionListener(e -> showLeaderboard());
         netMenu.add(leaderboardItem);
@@ -501,6 +507,74 @@ public class Minesweeper extends JFrame {
             timer.cancel();
             timer = null;
         }
+    }
+
+    private void showChangePasswordDialog() {
+        if (gameClient == null || !gameClient.isConnected()) {
+            JOptionPane.showMessageDialog(this,
+                    "Смена пароля доступна только онлайн.",
+                    "Аккаунт", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JPasswordField oldField = new JPasswordField(15);
+        JPasswordField newField = new JPasswordField(15);
+        JPasswordField confirmField = new JPasswordField(15);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(4, 4, 4, 4);
+        c.anchor = GridBagConstraints.WEST;
+
+        c.gridx = 0; c.gridy = 0; panel.add(new JLabel("Старый пароль:"), c);
+        c.gridx = 1; panel.add(oldField, c);
+
+        c.gridx = 0; c.gridy = 1; panel.add(new JLabel("Новый пароль:"), c);
+        c.gridx = 1; panel.add(newField, c);
+
+        c.gridx = 0; c.gridy = 2; panel.add(new JLabel("Повтор нового:"), c);
+        c.gridx = 1; panel.add(confirmField, c);
+
+        int result = JOptionPane.showConfirmDialog(this, panel,
+                "Смена пароля", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (result != JOptionPane.OK_OPTION) return;
+
+        String oldPass = new String(oldField.getPassword());
+        String newPass = new String(newField.getPassword());
+        String confirm = new String(confirmField.getPassword());
+
+        if (oldPass.isEmpty() || newPass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Заполните все поля",
+                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!newPass.equals(confirm)) {
+            JOptionPane.showMessageDialog(this, "Новые пароли не совпадают",
+                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (newPass.length() < 4) {
+            JOptionPane.showMessageDialog(this, "Пароль минимум 4 символа",
+                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        gameClient.changePassword(oldPass, newPass)
+                .whenComplete((resp, err) -> SwingUtilities.invokeLater(() -> {
+                    if (err != null) {
+                        JOptionPane.showMessageDialog(this,
+                                "Ошибка: " + err.getMessage(),
+                                "Смена пароля", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                resp.message,
+                                resp.success ? "Успех" : "Ошибка",
+                                resp.success ? JOptionPane.INFORMATION_MESSAGE
+                                        : JOptionPane.ERROR_MESSAGE);
+                    }
+                }));
     }
 
     // ====== Точка входа ======

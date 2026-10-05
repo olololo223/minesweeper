@@ -52,6 +52,8 @@ public class GameServerHandler extends SimpleChannelInboundHandler<GameMessage> 
                 case LEADERBOARD_REQUEST -> handleLeaderboard(ctx,
                         (LeaderboardRequest) msg.getPayload());
                 case REGISTER_REQUEST -> handleRegister(ctx, (RegisterRequest) msg.getPayload());
+                case CHANGE_PASSWORD_REQUEST -> handleChangePassword(ctx,
+                        (ChangePasswordRequest) msg.getPayload());
                 default -> {
                     var err = new LoginResponse(false,
                             "Неизвестный тип: " + msg.getType(), 0);
@@ -167,5 +169,56 @@ public class GameServerHandler extends SimpleChannelInboundHandler<GameMessage> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("Error on channel {}", ctx.channel().remoteAddress(), cause);
         ctx.close();
+    }
+
+    private void handleChangePassword(ChannelHandlerContext ctx,
+                                      ChangePasswordRequest req) throws Exception {
+        // 1. Кто это? Берём из сессии канала
+        Long userId = ctx.channel().attr(SessionKeys.USER_ID).get();
+        if (userId == null) {
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Сначала войдите в аккаунт")));
+            return;
+        }
+
+        // 2. Валидация
+        if (req.oldPassword == null || req.newPassword == null) {
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Не указан пароль")));
+            return;
+        }
+        if (req.newPassword.length() < 4) {
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Новый пароль минимум 4 символа")));
+            return;
+        }
+        if (req.newPassword.equals(req.oldPassword)) {
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Новый пароль совпадает со старым")));
+            return;
+        }
+
+        // 3. Найти пользователя и проверить старый пароль
+        User u = userDao.findById(userId);
+        if (u == null) {
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Пользователь не найден")));
+            return;
+        }
+        if (u.passwordHash != null
+                && !passwordEncoder.matches(req.oldPassword, u.passwordHash)) {
+            log.warn("Change password: wrong old password for user {}", u.username);
+            ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                    new ChangePasswordResponse(false, "Неверный старый пароль")));
+            return;
+        }
+
+        // 4. Хэшируем и сохраняем
+        String newHash = passwordEncoder.encode(req.newPassword);
+        userDao.setPasswordHash(userId, newHash);
+
+        log.info("User {} changed password", u.username);
+        ctx.writeAndFlush(new GameMessage(MessageType.CHANGE_PASSWORD_RESPONSE,
+                new ChangePasswordResponse(true, "Пароль изменён")));
     }
 }

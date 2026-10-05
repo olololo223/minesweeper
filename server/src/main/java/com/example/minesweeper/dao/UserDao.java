@@ -43,7 +43,6 @@ public class UserDao {
         throw new SQLException("Не удалось создать пользователя");
     }
 
-    /** Установить пароль существующему пользователю (миграция старой учётки). */
     public void setPasswordHash(long userId, String passwordHash) throws SQLException {
         String sql = "UPDATE users SET password_hash = ? WHERE id = ?";
         try (Connection c = DataSourceProvider.get().getConnection();
@@ -52,5 +51,23 @@ public class UserDao {
             ps.setLong(2, userId);
             ps.executeUpdate();
         }
+    }
+
+    public User findById(long id) throws SQLException {
+        String sql = "SELECT id, username, role, password_hash FROM users WHERE id = ?";
+        try (Connection c = DataSourceProvider.get().getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User u = new User(rs.getLong("id"),
+                            rs.getString("username"),
+                            rs.getString("role"));
+                    u.passwordHash = rs.getString("password_hash");
+                    return u;
+                }
+            }
+        }
+        return null;
     }
 }
