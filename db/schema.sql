@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS game_records (
                                             id               BIGINT PRIMARY KEY AUTO_INCREMENT,
                                             user_id          BIGINT NOT NULL,
                                             difficulty       VARCHAR(10) NOT NULL,
+    mode             VARCHAR(10) NOT NULL DEFAULT 'CLASSIC',
     duration_seconds INT NOT NULL,
     win              BOOLEAN NOT NULL,
     played_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -27,12 +28,14 @@ CREATE TABLE IF NOT EXISTS leaderboard (
                                            id                BIGINT PRIMARY KEY AUTO_INCREMENT,
                                            user_id           BIGINT NOT NULL,
                                            difficulty        VARCHAR(10) NOT NULL,
+    mode              VARCHAR(10) NOT NULL DEFAULT 'CLASSIC',
     best_time_seconds INT NOT NULL,
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_lb_user FOREIGN KEY (user_id)
     REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT uk_user_diff UNIQUE (user_id, difficulty)
+    -- Рекорд отдельный на каждую пару (сложность, режим)
+    CONSTRAINT uk_user_diff_mode UNIQUE (user_id, difficulty, mode)
     );
 
 CREATE TABLE IF NOT EXISTS admin_actions (

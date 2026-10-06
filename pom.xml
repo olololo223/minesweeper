@@ -27,6 +27,7 @@
         <spring.security.crypto.version>6.3.3</spring.security.crypto.version>
         <jackson.version>2.17.2</jackson.version>
         <junit.version>5.10.3</junit.version>
+        <jfreechart.version>1.5.4</jfreechart.version>
     </properties>
 
     <dependencyManagement>
@@ -79,6 +80,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>${jfreechart.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>

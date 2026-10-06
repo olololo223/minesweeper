@@ -12,6 +12,7 @@
         .card .num { font-size:32px; font-weight:bold; color:#2c3e50; }
         .card .lbl { color:#7f8c8d; margin-top:4px; }
         h2 { color:#2c3e50; margin-top:0; }
+        h3 { color:#2c3e50; margin:0 0 6px 0; }
         table { width:100%; background:white; border-collapse:collapse;
             border-radius:8px; overflow:hidden;
             box-shadow:0 1px 4px rgba(0,0,0,0.08); margin-bottom:20px; }
@@ -19,6 +20,8 @@
         th { background:#34495e; color:white; font-size:13px; }
         .top5 { display:flex; gap:20px; }
         .top5 > div { flex:1; }
+        .mode-label { font-size:13px; color:#7f8c8d; margin:10px 0 4px 0;
+            text-transform:uppercase; letter-spacing:1px; }
     </style>
 </head>
 <body>
@@ -36,42 +39,110 @@
         </div>
         <div class="card">
             <div class="num" th:text="${stats.wins}">0</div>
-            <div class="lbl">Побед</div>
+            <div class="lbl">Побед (всего)</div>
+        </div>
+        <div class="card">
+            <div class="num" th:text="${stats.recordsClassic}">0</div>
+            <div class="lbl">Классика</div>
+        </div>
+        <div class="card">
+            <div class="num" th:text="${stats.recordsTimed}">0</div>
+            <div class="lbl">На время</div>
         </div>
     </div>
 
     <h2>Топ-5 по сложностям</h2>
+
+    <!-- Три колонки — по одной на сложность, в каждой два режима -->
     <div class="top5">
+
+        <!-- Новичок -->
         <div>
             <h3>Новичок</h3>
+
+            <h4 class="mode-label">Классика</h4>
             <table>
                 <tr><th>Игрок</th><th>Время</th></tr>
-                <tr th:each="e : ${topEasy}">
+                <tr th:each="e : ${topEasyClassic}">
                     <td th:text="${e.username}">-</td>
                     <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(topEasyClassic)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
+            </table>
+
+            <h4 class="mode-label">На время</h4>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topEasyTimed}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(topEasyTimed)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
             </table>
         </div>
+
+        <!-- Любитель -->
         <div>
             <h3>Любитель</h3>
+
+            <h4 class="mode-label">Классика</h4>
             <table>
                 <tr><th>Игрок</th><th>Время</th></tr>
-                <tr th:each="e : ${topMedium}">
+                <tr th:each="e : ${topMediumClassic}">
                     <td th:text="${e.username}">-</td>
                     <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(topMediumClassic)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
+            </table>
+
+            <h4 class="mode-label">На время</h4>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topMediumTimed}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(topMediumTimed)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
             </table>
         </div>
+
+        <!-- Профессионал -->
         <div>
             <h3>Профессионал</h3>
+
+            <h4 class="mode-label">Классика</h4>
             <table>
                 <tr><th>Игрок</th><th>Время</th></tr>
-                <tr th:each="e : ${topHard}">
+                <tr th:each="e : ${topHardClassic}">
                     <td th:text="${e.username}">-</td>
                     <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(topHardClassic)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
+            </table>
+
+            <h4 class="mode-label">На время</h4>
+            <table>
+                <tr><th>Игрок</th><th>Время</th></tr>
+                <tr th:each="e : ${topHardTimed}">
+                    <td th:text="${e.username}">-</td>
+                    <td th:text="${e.best_time_seconds} + ' сек.'">-</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(topHardTimed)}">
+                    <td colspan="2" style="color:#95a5a6;text-align:center;">— нет —</td>
+                </tr>
             </table>
         </div>
+
     </div>
 </main>
 </body>

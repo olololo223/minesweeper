@@ -20,17 +20,21 @@ public class LeaderboardResponse {
     }
 
     public String difficulty;
+    public String mode;            // CLASSIC / TIMED
     public List<Entry> entries;
 
     public LeaderboardResponse() {}
-    public LeaderboardResponse(String difficulty, List<Entry> entries) {
+    public LeaderboardResponse(String difficulty, String mode,
+                               List<Entry> entries) {
         this.difficulty = difficulty;
+        this.mode = mode;
         this.entries = entries;
     }
 
     @Override
     public String toString() {
         return "LeaderboardResponse{difficulty='" + difficulty +
+                "', mode='" + mode +
                 "', entries=" + entries + '}';
     }
 }

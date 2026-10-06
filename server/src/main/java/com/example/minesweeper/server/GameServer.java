@@ -40,8 +40,19 @@ public class GameServer {
     }
 
     public static void main(String[] args) throws Exception {
-        Runtime.getRuntime().addShutdownHook(new Thread(
-                com.example.minesweeper.db.DataSourceProvider::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            com.example.minesweeper.db.DataSourceProvider.shutdown();
+            // Потоки пула комнат не демоны — без этого JVM не завершится
+            com.example.minesweeper.server.room.RoomManager.shutdown();
+        }));
+
+        if (Boolean.getBoolean("debug.allowMines")) {
+            log.warn("========================================");
+            log.warn("DEBUG MODE ENABLED (debug.allowMines=true)");
+            log.warn("Mines can be queried via DEBUG_GET_MINES");
+            log.warn("Do NOT use in production!");
+            log.warn("========================================");
+        }
 
         SslContext ssl = null;
         String cert = System.getProperty("tls.cert");

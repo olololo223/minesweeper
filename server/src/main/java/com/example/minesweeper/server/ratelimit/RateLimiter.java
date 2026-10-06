@@ -29,6 +29,28 @@ public class RateLimiter {
         // Рейтинг — 60/мин, burst 120.
         add(MessageType.LEADERBOARD_REQUEST, 120, 60.0 / 60);
 
+        // Поиск игроков — 20/мин, burst 30. Защита от перебора имён.
+        add(MessageType.FIND_USER_REQUEST, 30, 20.0 / 60);
+
+        // Операции с друзьями — 30/мин, burst 60.
+        add(MessageType.ADD_FRIEND_REQUEST, 60, 30.0 / 60);
+        add(MessageType.ACCEPT_FRIEND_REQUEST, 60, 30.0 / 60);
+        add(MessageType.DECLINE_FRIEND_REQUEST, 60, 30.0 / 60);
+        add(MessageType.REMOVE_FRIEND_REQUEST, 60, 30.0 / 60);
+
+        // Запрос списка друзей и счётчика заявок — 60/мин, burst 120.
+        add(MessageType.GET_FRIENDS_REQUEST, 120, 60.0 / 60);
+        add(MessageType.COUNT_FRIEND_REQUESTS_REQUEST, 120, 60.0 / 60);
+
+        // Комнаты: создание/старт — редко, список — часто, ходы — очень часто.
+        add(MessageType.CREATE_ROOM_REQUEST, 5, 3.0 / 60);
+        add(MessageType.JOIN_ROOM_REQUEST, 20, 15.0 / 60);
+        add(MessageType.LEAVE_ROOM_REQUEST, 20, 15.0 / 60);
+        add(MessageType.LIST_ROOMS_REQUEST, 60, 60.0 / 60);
+        add(MessageType.START_ROOM_REQUEST, 5, 3.0 / 60);
+        add(MessageType.DIG_REQUEST, 300, 120.0 / 60);    // 2 клика/сек, burst 300
+        add(MessageType.FLAG_REQUEST, 300, 120.0 / 60);
+
         // Всё остальное (PING и т.д.) — 120/мин, burst 240.
         add(MessageType.PING, 240, 120.0 / 60);
     }

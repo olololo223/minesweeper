@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Рейтинг (мультиплеер)</title>
+    <style>
+        body { font-family: sans-serif; margin:0; background:#ecf0f1; }
+        main { padding:20px 30px; }
+        h2 { color:#2c3e50; margin-top:0; }
+        .msg { background:#d4edda; color:#155724; padding:10px 14px;
+            border-radius:4px; margin:15px 0; }
+        table { width:100%; background:white; border-collapse:collapse;
+            border-radius:8px; overflow:hidden; margin-top:15px;
+            box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        th, td { padding:10px 12px; text-align:left; border-bottom:1px solid #ecf0f1; }
+        th { background:#34495e; color:white; font-size:13px; }
+        .btn { padding:5px 10px; border:none; border-radius:4px;
+            cursor:pointer; color:white; font-size:12px; }
+        .btn-del { background:#e74c3c; }
+        form { display:inline; }
+        .clear-form { margin-top:15px; }
+    </style>
+</head>
+<body>
+<div th:replace="fragments :: menu"></div>
+<main>
+    <h2>Рейтинг (мультиплеер)</h2>
+
+    <div class="msg" th:if="${msg}" th:text="${msg}"></div>
+
+    <table>
+        <tr>
+            <th>
+                <a th:href="@{/mp/leaderboard(sort='username', dir=${sort == 'username' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Игрок <span th:if="${sort == 'username'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/mp/leaderboard(sort='total_score', dir=${sort == 'total_score' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Суммарные очки <span th:if="${sort == 'total_score'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/mp/leaderboard(sort='total_games', dir=${sort == 'total_games' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Партий <span th:if="${sort == 'total_games'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/mp/leaderboard(sort='total_wins', dir=${sort == 'total_wins' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Побед <span th:if="${sort == 'total_wins'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+        </tr>
+        <tr th:each="e : ${entries}">
+            <td th:text="${e.username}">alice</td>
+            <td th:text="${e.total_score}">0</td>
+            <td th:text="${e.total_games}">0</td>
+            <td th:text="${e.total_wins}">0</td>
+        </tr>
+    </table>
+
+    <form method="post" action="/mp/leaderboard/clear" class="clear-form"
+          onsubmit="return confirm('Очистить рейтинг мультиплеера?');">
+        <input type="hidden" name="_csrf" th:value="${csrfToken}"/>
+        <button type="submit" class="btn btn-del">Очистить рейтинг</button>
+    </form>
+</main>
+</body>
+</html>

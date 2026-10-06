@@ -19,9 +19,15 @@ public class AdminController {
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("stats", dao.stats());
-        model.addAttribute("topEasy", dao.topByDifficulty("EASY"));
-        model.addAttribute("topMedium", dao.topByDifficulty("MEDIUM"));
-        model.addAttribute("topHard", dao.topByDifficulty("HARD"));
+
+        // Топ-5 по каждой комбинации «сложность × режим»
+        model.addAttribute("topEasyClassic", dao.topByDifficulty("EASY", "CLASSIC"));
+        model.addAttribute("topEasyTimed", dao.topByDifficulty("EASY", "TIMED"));
+        model.addAttribute("topMediumClassic", dao.topByDifficulty("MEDIUM", "CLASSIC"));
+        model.addAttribute("topMediumTimed", dao.topByDifficulty("MEDIUM", "TIMED"));
+        model.addAttribute("topHardClassic", dao.topByDifficulty("HARD", "CLASSIC"));
+        model.addAttribute("topHardTimed", dao.topByDifficulty("HARD", "TIMED"));
+
         return "index";
     }
 
@@ -66,33 +72,40 @@ public class AdminController {
 
     @GetMapping("/records")
     public String records(@RequestParam(defaultValue = "100") int limit,
+                          @RequestParam(required = false) String mode,
                           @RequestParam(required = false) String sort,
                           @RequestParam(required = false) String dir,
                           Model model) {
-        model.addAttribute("records", dao.listRecords(limit, sort, dir));
+        model.addAttribute("records", dao.listRecords(limit, mode, sort, dir));
         model.addAttribute("limit", limit);
+        model.addAttribute("mode", mode == null ? "ALL" : mode);
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
         return "records";
     }
 
     @PostMapping("/records/delete")
-    public String deleteRecord(@RequestParam long id, RedirectAttributes ra) {
+    public String deleteRecord(@RequestParam long id,
+                               @RequestParam(required = false) String mode,
+                               RedirectAttributes ra) {
         dao.deleteRecord(id);
         dao.logAction("RECORD_DELETE", "record#" + id, null);
         ra.addFlashAttribute("msg", "Запись удалена");
-        return "redirect:/records";
+        return "redirect:/records" + appendMode(mode);
     }
 
     // ===== РЕЙТИНГ =====
 
     @GetMapping("/leaderboard")
     public String leaderboard(@RequestParam(defaultValue = "EASY") String diff,
+                              @RequestParam(required = false) String mode,
                               @RequestParam(required = false) String sort,
                               @RequestParam(required = false) String dir,
                               Model model) {
+        String m = (mode == null || mode.isBlank()) ? "ALL" : mode;
         model.addAttribute("diff", diff);
-        model.addAttribute("entries", dao.listLeaderboard(diff, sort, dir));
+        model.addAttribute("mode", m);
+        model.addAttribute("entries", dao.listLeaderboard(diff, m, sort, dir));
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
         return "leaderboard";
@@ -102,31 +115,49 @@ public class AdminController {
     public String updateLeaderboard(@RequestParam long id,
                                     @RequestParam int seconds,
                                     @RequestParam String diff,
+                                    @RequestParam(required = false) String mode,
                                     RedirectAttributes ra) {
         dao.updateLeaderboardTime(id, seconds);
         dao.logAction("LB_UPDATE", "lb#" + id,
                 diff + " = " + seconds + " сек.");
         ra.addFlashAttribute("msg", "Время обновлено");
-        return "redirect:/leaderboard?diff=" + diff;
+        return "redirect:/leaderboard?diff=" + diff + appendModeQuery(mode);
     }
 
     @PostMapping("/leaderboard/delete")
     public String deleteLeaderboardEntry(@RequestParam long id,
                                          @RequestParam String diff,
+                                         @RequestParam(required = false) String mode,
                                          RedirectAttributes ra) {
         dao.deleteLeaderboardEntry(id);
         dao.logAction("LB_DELETE", "lb#" + id, diff);
         ra.addFlashAttribute("msg", "Запись удалена");
-        return "redirect:/leaderboard?diff=" + diff;
+        return "redirect:/leaderboard?diff=" + diff + appendModeQuery(mode);
     }
 
     @PostMapping("/leaderboard/clear")
     public String clearLeaderboard(@RequestParam String diff,
+                                   @RequestParam(required = false) String mode,
                                    RedirectAttributes ra) {
-        dao.clearLeaderboard(diff);
-        dao.logAction("LB_CLEAR", diff, "очистка рейтинга сложности " + diff);
-        ra.addFlashAttribute("msg", "Рейтинг " + diff + " очищен");
-        return "redirect:/leaderboard?diff=" + diff;
+        dao.clearLeaderboard(diff, mode);
+        String details = "очистка рейтинга " + diff
+                + (mode != null && !mode.isBlank() && !"ALL".equals(mode)
+                ? " / " + mode : " (все режимы)");
+        dao.logAction("LB_CLEAR", diff, details);
+        ra.addFlashAttribute("msg", details);
+        return "redirect:/leaderboard?diff=" + diff + appendModeQuery(mode);
+    }
+
+    /** "?mode=TIMED" для /records, либо пустая строка. */
+    private static String appendMode(String mode) {
+        return (mode == null || mode.isBlank() || "ALL".equals(mode))
+                ? "" : "?mode=" + mode;
+    }
+
+    /** "&mode=TIMED" для /leaderboard?diff=..., либо пустая строка. */
+    private static String appendModeQuery(String mode) {
+        return (mode == null || mode.isBlank() || "ALL".equals(mode))
+                ? "" : "&mode=" + mode;
     }
 
     @GetMapping("/audit")
@@ -134,5 +165,27 @@ public class AdminController {
         model.addAttribute("actions", dao.listActions(limit));
         model.addAttribute("limit", limit);
         return "audit";
+    }
+
+    @GetMapping("/mp")
+    public String mpLeaderboard(Model model) {
+        model.addAttribute("leaderboard", dao.listMpLeaderboard());
+        return "mp_leaderboard";
+    }
+
+    @GetMapping("/mp/records")
+    public String mpRecords(@RequestParam(defaultValue = "100") int limit,
+                            Model model) {
+        model.addAttribute("records", dao.listMpRecords(limit));
+        model.addAttribute("limit", limit);
+        return "mp_records";
+    }
+
+    @PostMapping("/mp/records/delete")
+    public String deleteMpRecord(@RequestParam long id, RedirectAttributes ra) {
+        dao.deleteMpRecord(id);
+        dao.logAction("MP_RECORD_DELETE", "mp#" + id, null);
+        ra.addFlashAttribute("msg", "Запись удалена");
+        return "redirect:/mp/records";
     }
 }

@@ -11,6 +11,8 @@
             border-radius:4px; text-decoration:none;
             background:white; color:#2c3e50; }
         .tabs a.active { background:#3498db; color:white; }
+        .tabs { margin-bottom:8px; }
+        .tabs-label { color:#7f8c8d; font-size:13px; margin:0 0 4px 2px; }
         .msg { background:#d4edda; color:#155724; padding:10px 14px;
             border-radius:4px; margin:15px 0; }
         table { width:100%; background:white; border-collapse:collapse;
@@ -31,13 +33,25 @@
 <div th:replace="fragments :: menu"></div>
 <main>
     <h2>Рейтинг</h2>
+
+    <div class="tabs-label">Сложность:</div>
     <div class="tabs">
-        <a href="/leaderboard?diff=EASY"
+        <a th:href="@{/leaderboard(diff='EASY', mode=${mode})}"
            th:classappend="${diff == 'EASY'} ? 'active'">Новичок</a>
-        <a href="/leaderboard?diff=MEDIUM"
+        <a th:href="@{/leaderboard(diff='MEDIUM', mode=${mode})}"
            th:classappend="${diff == 'MEDIUM'} ? 'active'">Любитель</a>
-        <a href="/leaderboard?diff=HARD"
+        <a th:href="@{/leaderboard(diff='HARD', mode=${mode})}"
            th:classappend="${diff == 'HARD'} ? 'active'">Профессионал</a>
+    </div>
+
+    <div class="tabs-label">Режим:</div>
+    <div class="tabs">
+        <a th:href="@{/leaderboard(diff=${diff}, mode='ALL')}"
+           th:classappend="${mode == 'ALL' or mode == null} ? 'active'">Все режимы</a>
+        <a th:href="@{/leaderboard(diff=${diff}, mode='CLASSIC')}"
+           th:classappend="${mode == 'CLASSIC'} ? 'active'">Классика</a>
+        <a th:href="@{/leaderboard(diff=${diff}, mode='TIMED')}"
+           th:classappend="${mode == 'TIMED'} ? 'active'">На время</a>
     </div>
 
     <div class="msg" th:if="${msg}" th:text="${msg}"></div>
@@ -45,25 +59,31 @@
     <table>
         <tr>
             <th>
-                <a th:href="@{/leaderboard(diff=${diff}, sort='id', dir=${sort == 'id' and dir == 'asc' ? 'desc' : 'asc'})}"
+                <a th:href="@{/leaderboard(diff=${diff}, mode=${mode}, sort='id', dir=${sort == 'id' and dir == 'asc' ? 'desc' : 'asc'})}"
                    style="color:white;text-decoration:none;">
                     ID <span th:if="${sort == 'id'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
                 </a>
             </th>
             <th>
-                <a th:href="@{/leaderboard(diff=${diff}, sort='username', dir=${sort == 'username' and dir == 'asc' ? 'desc' : 'asc'})}"
+                <a th:href="@{/leaderboard(diff=${diff}, mode=${mode}, sort='username', dir=${sort == 'username' and dir == 'asc' ? 'desc' : 'asc'})}"
                    style="color:white;text-decoration:none;">
                     Игрок <span th:if="${sort == 'username'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
                 </a>
             </th>
             <th>
-                <a th:href="@{/leaderboard(diff=${diff}, sort='best_time_seconds', dir=${sort == 'best_time_seconds' and dir == 'asc' ? 'desc' : 'asc'})}"
+                <a th:href="@{/leaderboard(diff=${diff}, mode=${mode}, sort='mode', dir=${sort == 'mode' and dir == 'asc' ? 'desc' : 'asc'})}"
+                   style="color:white;text-decoration:none;">
+                    Режим <span th:if="${sort == 'mode'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/leaderboard(diff=${diff}, mode=${mode}, sort='best_time_seconds', dir=${sort == 'best_time_seconds' and dir == 'asc' ? 'desc' : 'asc'})}"
                    style="color:white;text-decoration:none;">
                     Лучшее время <span th:if="${sort == 'best_time_seconds'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
                 </a>
             </th>
             <th>
-                <a th:href="@{/leaderboard(diff=${diff}, sort='updated_at', dir=${sort == 'updated_at' and dir == 'asc' ? 'desc' : 'asc'})}"
+                <a th:href="@{/leaderboard(diff=${diff}, mode=${mode}, sort='updated_at', dir=${sort == 'updated_at' and dir == 'asc' ? 'desc' : 'asc'})}"
                    style="color:white;text-decoration:none;">
                     Обновлено <span th:if="${sort == 'updated_at'}" th:text="${dir == 'desc'} ? '▼' : '▲'"></span>
                 </a>
@@ -73,11 +93,13 @@
         <tr th:each="e : ${entries}">
             <td th:text="${e.id}">1</td>
             <td th:text="${e.username}">alice</td>
+            <td th:text="${e.mode == 'TIMED'} ? 'На время' : 'Классика'">-</td>
             <td>
                 <form method="post" action="/leaderboard/update">
                     <input type="hidden" name="_csrf" th:value="${csrfToken}"/>
                     <input type="hidden" name="id" th:value="${e.id}"/>
                     <input type="hidden" name="diff" th:value="${diff}"/>
+                    <input type="hidden" name="mode" th:value="${mode}"/>
                     <input type="number" name="seconds" min="1"
                            th:value="${e.best_time_seconds}"/>
                     <button type="submit" class="btn btn-save">ОК</button>
@@ -90,6 +112,7 @@
                     <input type="hidden" name="_csrf" th:value="${csrfToken}"/>
                     <input type="hidden" name="id" th:value="${e.id}"/>
                     <input type="hidden" name="diff" th:value="${diff}"/>
+                    <input type="hidden" name="mode" th:value="${mode}"/>
                     <button type="submit" class="btn btn-del">Удалить</button>
                 </form>
             </td>
@@ -97,10 +120,13 @@
     </table>
 
     <form method="post" action="/leaderboard/clear" class="clear-form"
-          onsubmit="return confirm('Очистить весь рейтинг по этой сложности?');">
+          onsubmit="return confirm('Очистить рейтинг по выбранному фильтру режима?');">
         <input type="hidden" name="_csrf" th:value="${csrfToken}"/>
         <input type="hidden" name="diff" th:value="${diff}"/>
-        <button type="submit" class="btn btn-del">Очистить рейтинг сложности</button>
+        <input type="hidden" name="mode" th:value="${mode}"/>
+        <button type="submit" class="btn btn-del">
+            Очистить <span th:text="${mode == 'ALL' ? 'все режимы' : (mode == 'TIMED' ? 'режим На время' : 'режим Классика')}"></span>
+        </button>
     </form>
 </main>
 </body>

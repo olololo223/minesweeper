@@ -2,9 +2,11 @@ package com.example.minesweeper.protocol.payload;
 
 public class LeaderboardRequest {
     public String difficulty;
+    public String mode;            // CLASSIC / TIMED
 
     public LeaderboardRequest() {}
-    public LeaderboardRequest(String difficulty) {
+    public LeaderboardRequest(String difficulty, String mode) {
         this.difficulty = difficulty;
+        this.mode = mode;
     }
 }

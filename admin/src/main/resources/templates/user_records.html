@@ -24,12 +24,13 @@
     <h2>Партии игрока (ID <span th:text="${userId}">1</span>)</h2>
     <table>
         <tr>
-            <th>ID</th><th>Сложность</th><th>Время</th>
+            <th>ID</th><th>Сложность</th><th>Режим</th><th>Время</th>
             <th>Результат</th><th>Когда</th>
         </tr>
         <tr th:each="r : ${records}">
             <td th:text="${r.id}">1</td>
             <td th:text="${r.difficulty}">EASY</td>
+            <td th:text="${r.mode == 'TIMED'} ? 'На время' : 'Классика'">-</td>
             <td th:text="${r.duration_seconds} + ' сек.'">42</td>
             <td th:classappend="${r.win} ? 'win' : 'lose'"
                 th:text="${r.win} ? 'Победа' : 'Проигрыш'">-</td>
