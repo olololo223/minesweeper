@@ -27,7 +27,8 @@ jpackage ^
   --win-menu ^
   --win-shortcut ^
   --win-dir-chooser ^
-  --win-per-user-install
+  --win-per-user-install ^
+  --runtime-image my-own-runtime
 
 echo === Done: packaging\output ===
 pause
