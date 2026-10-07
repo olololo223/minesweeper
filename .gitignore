@@ -77,3 +77,49 @@ server-key.pem
 # ОС
 Thumbs.db
 desktop.ini
+
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Android build outputs
+*.apk
+*.aab
+*.ap_
+output-metadata.json
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# Generated files
+captures/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin/Java
+*.class
+
+# Signing files — never commit private keys
+*.jks
+*.keystore
+signing.properties
+
+# Google Services
+# Uncomment if this file contains project-specific or sensitive configuration
+# google-services.json

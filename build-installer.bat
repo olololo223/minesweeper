@@ -16,7 +16,7 @@ if exist packaging\output rmdir /s /q packaging\output
 mkdir packaging\output
 
 jpackage ^
-  --type msi ^
+  --type exe ^
   --name "Minesweeper" ^
   --app-version "1.0.0" ^
   --input packaging\input ^
