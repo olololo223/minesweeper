@@ -18,7 +18,7 @@ mkdir packaging\output
 jpackage ^
   --type exe ^
   --name "Minesweeper" ^
-  --app-version "1.0.0" ^
+  --app-version "1.0.1" ^
   --input packaging\input ^
   --main-jar minesweeper-client-1.0-SNAPSHOT.jar ^
   --main-class com.example.minesweeper.ui.Minesweeper ^

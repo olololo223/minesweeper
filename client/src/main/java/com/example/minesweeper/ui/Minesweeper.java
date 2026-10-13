@@ -1004,7 +1004,7 @@ public class Minesweeper extends JFrame {
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    new MultiplayerFrame(gameClient, resp.roomId);
+                    new MultiplayerFrame(gameClient, resp.roomId).setVisible(true);;
                 }));
     }
     private void showMpLeaderboard() {
